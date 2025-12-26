@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Decentralized Web3</title>
+
+<!-- Ethers.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.8.0/ethers.umd.min.js"></script>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+
+        /* 🔥 Background Image Added */
+        background:
+            linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.85)),
+            url("https://images.unsplash.com/photo-1622630998477-20aa696ecb05?auto=format&fit=crop&w=1920&q=80");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .card {
+        width: 380px;
+        background: rgba(0, 0, 0, 0.75);
+        padding: 40px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+        backdrop-filter: blur(14px);
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    h1 {
+        margin-bottom: 10px;
+        color: #00ffe0;
+    }
+
+    p {
+        color: #ccc;
+        margin-bottom: 25px;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 14px;
+        border-radius: 30px;
+        border: none;
+        background: linear-gradient(90deg, #00ffe0, #0077ff);
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 20px rgba(0, 255, 224, 0.6);
+    }
+
+    .wallet-box {
+        display: none;
+        margin-top: 25px;
+        background: rgba(255,255,255,0.08);
+        padding: 15px;
+        border-radius: 12px;
+        text-align: left;
+    }
+
+    .wallet-label {
+        font-size: 14px;
+        color: #00ffe0;
+        margin-bottom: 6px;
+    }
+
+    .wallet-address {
+        font-size: 14px;
+        word-break: break-all;
+        background: rgba(0,0,0,0.6);
+        padding: 10px;
+        border-radius: 8px;
+        color: #fff;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <h1>Authentication Login</h1>
+    <p>Secure Sign-In</p>
+
+    <button class="btn" id="authBtn">Couple MetaMask</button>
+
+    <div class="wallet-box" id="walletBox">
+        <div class="wallet-label">Wallet Connected</div>
+        <div class="wallet-address" id="walletAddress"></div>
+    </div>
+</div>
+
+<script>
+    const authBtn = document.getElementById("authBtn");
+    const walletBox = document.getElementById("walletBox");
+    const walletAddressDiv = document.getElementById("walletAddress");
+
+    let isLoggedIn = false;
+    let provider, signer;
+
+    authBtn.addEventListener("click", async () => {
+        if (!isLoggedIn) {
+            await login();
+        } else {
+            logout();
+        }
+    });
+
+    async function login() {
+        try {
+            if (!window.ethereum) {
+                alert("MetaMask not installed");
+                return;
+            }
+
+            provider = new ethers.BrowserProvider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            signer = await provider.getSigner();
+
+            const address = await signer.getAddress();
+
+            const nonce = "Login nonce: " + Math.floor(Math.random() * 1000000);
+            await signer.signMessage(nonce);
+
+            walletAddressDiv.innerText = address;
+            walletBox.style.display = "block";
+            authBtn.innerText = "Logout";
+            isLoggedIn = true;
+
+        } catch (err) {
+            alert("Login cancelled or failed");
+        }
+    }
+
+    function logout() {
+        walletBox.style.display = "none";
+        walletAddressDiv.innerText = "";
+        authBtn.innerText = "Login with MetaMask";
+        isLoggedIn = false;
+    }
+</script>
+
+</body>
+</html>
